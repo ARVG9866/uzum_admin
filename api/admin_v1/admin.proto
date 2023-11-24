@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package admin_v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/Shemistan/uzum_admin/pkg/admin_v1;admin_v1";
+
+service AdminV1 {
+    rpc AddProduct(AddProduct.Request) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/admin/v1/product"
+            body: "*"
+        };
+    };
+
+    rpc UpdateProduct(UpdateProduct.Request) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put: "/admin/v1/product"
+            body: "*"
+        };
+    };
+
+    rpc DeleteProduct(DeleteProduct.Request) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/admin/v1/product"
+        };
+    };
+
+    rpc GetProduct(GetProduct.Request) returns (GetProduct.Response) {
+        option (google.api.http) = {
+            get: "/admin/v1/product/{product_id}"
+        };
+    };
+
+    rpc GetProducts(GetProducts.Request) returns (GetProducts.Response) {
+        option (google.api.http) = {
+            get: "/admin/v1/product/all"
+        };
+    };
+
+    rpc GetStatistics(google.protobuf.Empty) returns (GetStatistics.Response) {
+        option (google.api.http) = {
+            get: "/admin/v1/product/statistic"
+        };
+    };
+}
+
+message AddProduct {
+    message Request {
+        Product product = 1;
+    }
+}
+
+message UpdateProduct {
+    message Request {
+        Product product = 1;
+    }
+}
+
+message DeleteProduct {
+    message Request {
+        int64 product_id = 1;
+    }
+}
+
+message GetProduct {
+    message Request {
+        int64 product_id = 1;
+    }
+
+    message Response {
+        Product product = 1;
+    }
+}
+
+message GetProducts {
+    message Request {
+        int32 page = 1;
+        int32 size = 2;
+    }
+
+    message Response {
+        repeated Product product = 1;
+    }
+}
+
+message GetStatistics {
+    message Response {
+        Statistic statistic = 1;
+    }    
+}
+
+message Product {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    double price = 4;
+    int64 count = 5;
+}
+
+message Statistic {
+    int32 count_sold = 1;
+    double earned = 2;
+    repeated Product product = 3;
+}

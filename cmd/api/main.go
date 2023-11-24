@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/Shemistan/uzum_admin/cmd/api/serv"
 	"github.com/Shemistan/uzum_admin/cmd/conf"
 	"github.com/Shemistan/uzum_admin/internal/models"
@@ -10,7 +12,6 @@ import (
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"log"
 )
 
 const (
@@ -47,7 +48,7 @@ func main() {
 		log.Fatal("failed to get serv", err.Error())
 	}
 
-	log.Println("delivery server is running at port:", httpPort)
+	log.Println("Admin server is running at port:", httpPort)
 	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)

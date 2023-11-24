@@ -5,5 +5,5 @@ type Product struct {
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
 	Price       float64 `json:"price"`
-	Count       uint64  `json:"count"`
+	Count       int64   `json:"count"`
 }

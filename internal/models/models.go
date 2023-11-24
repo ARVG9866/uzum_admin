@@ -19,3 +19,14 @@ type Coordinate struct {
 	Longitude float64 `json:"longitude"`
 	Latitude  float64 `json:"latitude"`
 }
+
+type Statistic struct {
+	CountSold int32      `json:"count_sold"`
+	Earned    float64    `json:"earned"`
+	Products  []*Product `json:"products"`
+}
+
+type GetAllSetting struct {
+	Page int32 `json:"page"`
+	Size int32 `json:"size"`
+}
