@@ -32,7 +32,6 @@ func (a *Admin) UpdateProduct(ctx context.Context, req *pb.UpdateProduct_Request
 	if err != nil {
 		return &emptypb.Empty{}, err
 	}
-
 	err = a.AdminService.UpdateProduct(ctx, convert.PbToModelProduct(req.Product))
 
 	return &emptypb.Empty{}, err
@@ -56,6 +55,9 @@ func (a *Admin) GetProduct(ctx context.Context, req *pb.GetProduct_Request) (*pb
 	}
 
 	product, err := a.AdminService.GetProduct(ctx, req.ProductId)
+	if err != nil {
+		return nil, err
+	}
 
 	return &pb.GetProduct_Response{
 		Product: convert.ModelToPbProduct(product),
@@ -90,7 +92,7 @@ func (a *Admin) GetProducts(ctx context.Context, req *pb.GetProducts_Request) (*
 	return rtn, nil
 }
 
-func (a *Admin) GetStatistics(ctx context.Context) (*pb.GetStatistics_Response, error) {
+func (a *Admin) GetStatistics(ctx context.Context, _ *emptypb.Empty) (*pb.GetStatistics_Response, error) {
 	res, err := a.AdminService.GetStatistics(ctx)
 	if err != nil {
 		return nil, err

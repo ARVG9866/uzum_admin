@@ -1,4 +1,4 @@
-package service
+package admin_v1
 
 import (
 	"context"

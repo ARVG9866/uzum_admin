@@ -16,37 +16,7 @@
     "application/json"
   ],
   "paths": {
-    "/admin/v1/product": {
-      "delete": {
-        "operationId": "AdminV1_DeleteProduct",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "type": "object",
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "productId",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "int64"
-          }
-        ],
-        "tags": [
-          "AdminV1"
-        ]
-      },
+    "/admin/v1/product/add": {
       "post": {
         "operationId": "AdminV1_AddProduct",
         "responses": {
@@ -77,7 +47,96 @@
         "tags": [
           "AdminV1"
         ]
-      },
+      }
+    },
+    "/admin/v1/product/all": {
+      "post": {
+        "operationId": "AdminV1_GetProducts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/admin_v1GetProductsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/admin_v1GetProductsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminV1"
+        ]
+      }
+    },
+    "/admin/v1/product/delete": {
+      "put": {
+        "operationId": "AdminV1_DeleteProduct",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/admin_v1DeleteProductRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminV1"
+        ]
+      }
+    },
+    "/admin/v1/product/statistic": {
+      "get": {
+        "operationId": "AdminV1_GetStatistics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/admin_v1GetStatisticsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "AdminV1"
+        ]
+      }
+    },
+    "/admin/v1/product/update": {
       "put": {
         "operationId": "AdminV1_UpdateProduct",
         "responses": {
@@ -105,66 +164,6 @@
             }
           }
         ],
-        "tags": [
-          "AdminV1"
-        ]
-      }
-    },
-    "/admin/v1/product/all": {
-      "get": {
-        "operationId": "AdminV1_GetProducts",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/admin_v1GetProductsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          }
-        ],
-        "tags": [
-          "AdminV1"
-        ]
-      }
-    },
-    "/admin/v1/product/statistic": {
-      "get": {
-        "operationId": "AdminV1_GetStatistics",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/admin_v1GetStatisticsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
         "tags": [
           "AdminV1"
         ]
@@ -211,11 +210,33 @@
         }
       }
     },
+    "admin_v1DeleteProductRequest": {
+      "type": "object",
+      "properties": {
+        "productId": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "admin_v1GetProductResponse": {
       "type": "object",
       "properties": {
         "product": {
           "$ref": "#/definitions/admin_v1Product"
+        }
+      }
+    },
+    "admin_v1GetProductsRequest": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

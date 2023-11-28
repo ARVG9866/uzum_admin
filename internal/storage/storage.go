@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/fatih/structs"
 	"github.com/jmoiron/sqlx"
 
 	"github.com/Shemistan/uzum_admin/internal/models"
@@ -12,10 +13,9 @@ import (
 
 const productTable = "product"
 const statisticTable = "statistic"
-const historyTable = "history"
+const orderProductTable = "order_product"
 
 type IStorage interface {
-	// AddProduct(ctx context.Context, req *models.Product) (int64, error)
 	CreateProduct(ctx context.Context, req *models.Product) error
 	UpdateProduct(ctx context.Context, req *models.Product) error
 	DeleteProduct(ctx context.Context, id int64) error
@@ -48,12 +48,8 @@ func (s *storage) CreateProduct(ctx context.Context, req *models.Product) error 
 }
 
 func (s *storage) UpdateProduct(ctx context.Context, req *models.Product) error {
-	builder := sq.Update(productTable).SetMap(map[string]interface{}{
-		"name":        req.Name,
-		"description": req.Description,
-		"price":       req.Price,
-		"count":       req.Count,
-	}).
+	m := structs.Map(req)
+	builder := sq.Update(productTable).SetMap(m).
 		Where(sq.Eq{"id": req.ID}).
 		RunWith(s.db).
 		PlaceholderFormat(sq.Dollar)
@@ -67,7 +63,10 @@ func (s *storage) UpdateProduct(ctx context.Context, req *models.Product) error 
 }
 
 func (s *storage) DeleteProduct(ctx context.Context, id int64) error {
-	builder := sq.Delete(productTable).
+	builder := sq.Update(productTable).SetMap(map[string]interface{}{
+		"count":   0,
+		"deleted": true,
+	}).
 		Where(sq.Eq{"id": id}).
 		RunWith(s.db).
 		PlaceholderFormat(sq.Dollar)
@@ -85,7 +84,7 @@ func (s *storage) GetProduct(ctx context.Context, id int64) (*models.Product, er
 
 	builder := sq.Select("id", "name", "description", "price", "count").
 		From(productTable).
-		Where(sq.Eq{"id": id}).
+		Where(sq.Eq{"id": id, "deleted": false}).
 		RunWith(s.db).
 		PlaceholderFormat(sq.Dollar)
 
@@ -102,6 +101,7 @@ func (s *storage) GetAllProducts(ctx context.Context, req *models.GetAllSetting)
 
 	builder := sq.Select("id", "name", "description", "price", "count").
 		From(productTable).
+		Where(sq.Eq{"deleted": false}).
 		RunWith(s.db).
 		PlaceholderFormat(sq.Dollar).
 		Offset(uint64(req.Page)).
@@ -127,9 +127,9 @@ func (s *storage) GetAllProducts(ctx context.Context, req *models.GetAllSetting)
 }
 
 func (s *storage) GetStatistics(ctx context.Context) (*models.Statistic, error) {
-	var statistic *models.Statistic
+	var statistic models.Statistic
 
-	str_query := fmt.Sprintf(`SELECT SUM(count), SUM(price) FROM %s`, historyTable)
+	str_query := fmt.Sprintf(`SELECT SUM(count), SUM(price) FROM %s;`, orderProductTable)
 
 	err := s.db.QueryRowContext(ctx, str_query).Scan(&statistic.CountSold, &statistic.Earned)
 	if err != nil {
@@ -137,8 +137,8 @@ func (s *storage) GetStatistics(ctx context.Context) (*models.Statistic, error) 
 	}
 
 	str_query = fmt.Sprintf(`SELECT %s.id, %s.name, %s.price, %s.count FROM %s
-			JOIN %s USING (product_ID)`,
-		productTable, productTable, historyTable, historyTable, historyTable, productTable)
+			JOIN %s ON %s.product_id=%s.id;`,
+		productTable, productTable, orderProductTable, orderProductTable, orderProductTable, productTable, orderProductTable, productTable)
 
 	rows, err := s.db.QueryContext(ctx, str_query)
 	if err != nil {
@@ -156,5 +156,5 @@ func (s *storage) GetStatistics(ctx context.Context) (*models.Statistic, error) 
 		statistic.Products = append(statistic.Products, &product)
 	}
 
-	return statistic, nil
+	return &statistic, nil
 }

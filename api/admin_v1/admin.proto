@@ -2,31 +2,32 @@ syntax = "proto3";
 
 package admin_v1;
 
-import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
-import "google/protobuf/wrappers.proto";
 import "google/api/annotations.proto";
+import "google/api/validate.proto";
+
 
 option go_package = "github.com/Shemistan/uzum_admin/pkg/admin_v1;admin_v1";
 
 service AdminV1 {
     rpc AddProduct(AddProduct.Request) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            post: "/admin/v1/product"
+            post: "/admin/v1/product/add"
             body: "*"
         };
     };
 
     rpc UpdateProduct(UpdateProduct.Request) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            put: "/admin/v1/product"
+            put: "/admin/v1/product/update"
             body: "*"
         };
     };
 
     rpc DeleteProduct(DeleteProduct.Request) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/admin/v1/product"
+            put: "/admin/v1/product/delete"
+            body: "*"
         };
     };
 
@@ -38,7 +39,8 @@ service AdminV1 {
 
     rpc GetProducts(GetProducts.Request) returns (GetProducts.Response) {
         option (google.api.http) = {
-            get: "/admin/v1/product/all"
+            post: "/admin/v1/product/all"
+            body: "*"
         };
     };
 
@@ -57,19 +59,19 @@ message AddProduct {
 
 message UpdateProduct {
     message Request {
-        Product product = 1;
+        Product product = 1 [(validate.rules).message.required = true];
     }
 }
 
 message DeleteProduct {
     message Request {
-        int64 product_id = 1;
+        int64 product_id = 1 [(validate.rules).int64.gte = 1];
     }
 }
 
 message GetProduct {
     message Request {
-        int64 product_id = 1;
+        int64 product_id = 1 [(validate.rules).int64.gte = 1];
     }
 
     message Response {
@@ -96,8 +98,8 @@ message GetStatistics {
 
 message Product {
     int64 id = 1;
-    string name = 2;
-    string description = 3;
+    string name = 2 [(validate.rules).string.min_len = 1];
+    string description = 3 [(validate.rules).string.min_len = 1];
     double price = 4;
     int64 count = 5;
 }
