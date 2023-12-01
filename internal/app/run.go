@@ -10,6 +10,7 @@ import (
 func (a *App) Run() error {
 	wg := sync.WaitGroup{}
 	wg.Add(3)
+	// wg.Add(2)
 
 	go func() {
 		defer wg.Done()
